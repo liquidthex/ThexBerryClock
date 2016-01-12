@@ -8,17 +8,19 @@ from rgbmatrix import RGBMatrix
 import Image
 import ImageDraw
 import ImageFont
+from exchanges.bitstamp import Bitstamp
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, mode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList
+  global matrix, canvas, font, clockmode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList, rainbowBorderMode
+  rainbowBorderMode = 0
   sleep = 0.01
-  mode = effect_startupSplash
+  clockmode = effect_startupSplash
   iterations = 0
   bitcoin = 0
   itime = int(time.time())
   timers = {'bitcoin':itime};
-  timerFreqList = {'bitcoin':20};
+  timerFreqList = {'bitcoin':60};
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
   matrix.pwmBits = 11
@@ -32,10 +34,10 @@ def shutDown():
 
 def getBitcoinPrice():
   global bitcoin
-  bitcoin = bitcoin + 5 
+  bitcoin = Bitstamp.get_current_price()
 
 def mainLoop():
-  global image, draw, itime
+  global image, draw, itime, clockmode
 
   # Keep track of the current iteration's time
   itime = int(time.time())
@@ -44,8 +46,17 @@ def mainLoop():
   image = Image.new("RGB", (64,32))
   draw = ImageDraw.Draw(image)
 
-  # Execute the current mode
-  mode()
+  # Determine the mode to be in
+  h = time.strftime("%I")
+  m = time.strftime("%M")
+  if (h == "04" and (m == "19" or m == "20")) or (h == "07" and (m == "09" or m == "10")):
+    clockmode = clock420
+    rainbowBorder()
+
+  # Execute the current clock line
+  clockmode()
+
+  bitcoinDisplay()
 
   # Perform frequency-based timers
   for timer in timerFreqList:
@@ -75,8 +86,8 @@ def effect_startupSplash():
   draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
   draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
   if iterations > 10:
-    global mode
-    mode = mainClock
+    global clockmode
+    clockmode = mainClock
 
 def effect_flashBorder(duration):
   if not duration:
@@ -88,11 +99,7 @@ def mainClock():
   s = time.strftime("%S")
   ampm = time.strftime("%p")
 
-  # Pre-420
-  if (h == "12" and (m == "54" or m == "55")) or (h == "7" and (m == "9" or m == "10")):
-   (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
-  else:
-   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
 
   # Colon Blink Color
   if (itime % 2 == 0):
@@ -107,11 +114,51 @@ def mainClock():
   draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
   draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
 
+def bitcoinDisplay():
+  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  draw.text((1, 7), "BTC: " + str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
+
+def clock420():
+  global rainbowBorderMode, clockmode
+  h = time.strftime("%I")
+  m = time.strftime("%M")
+  s = time.strftime("%S")
+  ampm = time.strftime("%p")
+  if (h == "04" and m == "21") or (h == "07" and m == "11"):
+   clockmode = mainClock
+
+  (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
+
+  if m == "20" or m == "10":
+    rainbowBorderMode = 1
+    if itime % 2 == 0:
+      (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+      draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
+      draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
+      draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
+      draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
+      draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
+      draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
+    else:
+      (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
+      draw.text((5, -1), "CHEERS!!!!!", font=font, fill=rgb_to_hex((r,g,b)))
+  else:
+    rainbowBorderMode = 0
+    (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+    draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
+    draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
+    draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
+    draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
+    draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
+    draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
+
 def rainbowBorder():
   (w,h) = image.size
   pix = image.load()
-  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
-#  (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
+  if (rainbowBorderMode == 1):
+    (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
+  else:
+    (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
   
   for x in range(0,w):
     for y in range(0,h):
