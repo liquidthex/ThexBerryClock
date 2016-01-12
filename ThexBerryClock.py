@@ -21,6 +21,8 @@ def startUp():
   timerFreqList = {'bitcoin':20};
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
+  matrix.pwmBits = 11
+  matrix.brightness = 80
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
 
@@ -72,7 +74,7 @@ def effect_startupSplash():
   draw.text((1, 7), "THEXBERRY", font=font, fill=rgb_to_hex((r2,g2,b2)))
   draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
   draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
-  if iterations > 5:
+  if iterations > 10:
     global mode
     mode = mainClock
 
@@ -82,14 +84,15 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
   h = str(time.strftime("%I"))
   m = str(time.strftime("%M"))
   s = str(time.strftime("%S"))
   ampm = str(time.strftime("%p"))
   draw.text((5, -1), h, font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
   draw.text((18, -1), m, font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
   draw.text((31, -1), s, font=font, fill=rgb_to_hex((r,g,b)))
   draw.text((43, -1), ampm, font=font, fill=rgb_to_hex((r,g,b)))
 
