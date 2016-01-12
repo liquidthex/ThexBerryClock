@@ -26,7 +26,7 @@ def shutDown():
 
 def getBitcoinPrice():
   global bitcoin
-  bitcoin = 5
+  bitcoin = bitcoin + 5 
 
 def mainLoop():
   global image, draw
