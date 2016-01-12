@@ -10,10 +10,11 @@ import ImageFont
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, mode, iterations, itime
+  global matrix, canvas, font, mode, iterations, itime, bitcoin
   itime = time.time()
   mode = 0
   iterations = 0
+  bitcoin = 0
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
@@ -21,6 +22,9 @@ def startUp():
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
   exit
+
+def getBitcoinPrice():
+  bitcoin = 5
 
 def mainLoop():
   global image, draw, itime
@@ -33,7 +37,11 @@ def mainLoop():
 
   rainbowBorder()
 
+  if (iterator % 6000):
+    thread.start_new_thread( getBitcoinPrice, () )
+
   renderDisplay()
+  time.sleep(0.01)
 
 def renderDisplay():
   setimage(image, canvas)
