@@ -44,7 +44,7 @@ def mainLoop():
   for timer in timers:
     timeSince = itime - timers[timer]
     if timeSince > timerFreqList[timer]:
-      timerFuncList[timer] 
+      timerFuncList[timer]()
 
 #  rainbowBorder()
 #    thread.start_new_thread( getBitcoinPrice, () )
