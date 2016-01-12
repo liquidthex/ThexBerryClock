@@ -8,7 +8,10 @@ from rgbmatrix import RGBMatrix
 import Image
 import ImageDraw
 import ImageFont
+import locale
 from exchanges.bitstamp import Bitstamp
+
+locale.setlocale( locale.LC_ALL, '' )
 
 def startUp():
   log("Starting up ThexBerryClock...")
@@ -132,7 +135,7 @@ def mainClock():
 
 def bitcoinDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  btcs = str(btcopen)
+  btcs = locale.currency(btcopen, grouping=False, symbol=False)
   if btcs.startswith("-"):
     btcstr = btcs[1:]
     (r1,g1,b1) = (255,0,0)
