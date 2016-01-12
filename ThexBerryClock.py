@@ -39,7 +39,8 @@ def mainLoop():
 #  rainbowBorder()
 
   if (iterations % 6000):
-    thread.start_new_thread( getBitcoinPrice, () )
+    getBitcoinPrice()
+#    thread.start_new_thread( getBitcoinPrice, () )
 
   renderDisplay()
   time.sleep(sleep)
