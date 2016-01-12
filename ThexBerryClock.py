@@ -49,7 +49,7 @@ def renderDisplay():
   matrix.SwapOnVSync(canvas)
 
 def effect_flashBorder(duration):
-  if (!duration):
+  if not duration:
     duration = 60
 
 def mainClock():
