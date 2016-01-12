@@ -90,7 +90,7 @@ def mainClock():
 
   # Pre-420
   if (h == "12" and (m == "52" or m == "53")) or (h == "7" and (m == "9" or m == "10")):
-   (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, itime)
+   (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, int(iterations/3))
   else:
    (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
 
