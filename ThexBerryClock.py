@@ -22,7 +22,7 @@ def startUp():
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
   matrix.pwmBits = 11
-  matrix.brightness = 80
+  matrix.brightness = 50
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
 
@@ -85,7 +85,8 @@ def effect_flashBorder(duration):
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
   if (itime % 2 == 0):
-    (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+    (r1,g1,b1) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
+#    (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
   else:
     (r1,g1,b1) = (r,g,b)
   h = str(time.strftime("%I"))
