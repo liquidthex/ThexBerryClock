@@ -20,8 +20,8 @@ rm "${tmpfile}"
 if [ ! -z "${test}" ]; then   # If there is NOT new code to update...
   exit 0
 else # There IS new code to update
-  sudo ~/ThexBerryClock/killclock.sh
+  sudo /opt/ThexBerryClock/killclock.sh
   sleep 0.5
-  sudo ~/ThexBerryClock/ThexBerryClock.py &
+  sudo /opt/ThexBerryClock/ThexBerryClock.py &
   exit 1
 fi
