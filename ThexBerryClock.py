@@ -100,7 +100,7 @@ def effect_startupSplash():
   (r2,g2,b2) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+5)
   (r3,g3,b3) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
   (r4,g4,b4) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+15)
-  draw.text((5, -1), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, -1), time.strftime("%I:%M:%S ")+time.strftime("%p").upper(), font=font, fill=rgb_to_hex((r,g,b)))
   draw.text((1, 7), "THEXBERRY", font=font, fill=rgb_to_hex((r2,g2,b2)))
   draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
   draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
@@ -116,7 +116,7 @@ def mainClock():
   h = time.strftime("%I")
   m = time.strftime("%M")
   s = time.strftime("%S")
-  ampm = time.strftime("%p")
+  ampm = time.strftime("%p").upper()
 
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
 
@@ -152,7 +152,7 @@ def clock420():
   h = time.strftime("%I")
   m = time.strftime("%M")
   s = time.strftime("%S")
-  ampm = time.strftime("%p")
+  ampm = time.strftime("%p").upper()
   if (h == "04" and m == "21") or (h == "07" and m == "11"):
    clockmode = mainClock
 
