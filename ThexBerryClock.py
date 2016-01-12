@@ -51,9 +51,13 @@ def mainLoop():
   # Determine the mode to be in
   h = time.strftime("%I")
   m = time.strftime("%M")
+  s = time.strftime("%S")
   if (h == "04" and (m == "19" or m == "20")) or (h == "07" and (m == "09" or m == "10")):
     clockmode = clock420
     rainbowBorder()
+
+  if m == "00" and (s == "00" or s == "01"):
+    effect_borderPulse()
 
   # Execute the current clock line
   clockmode()
@@ -77,6 +81,15 @@ def mainLoop():
 def renderDisplay():
   setimage(image, canvas)
   matrix.SwapOnVSync(canvas)
+
+def effect_borderPulse():
+  (w,h) = image.size
+  pix = image.load()
+  (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
+  for x in range(0,w):
+    for y in range(0,h):
+      if (x == 0 or x == 63 or y == 0 or y == 31):
+        pix[x, y] = (r, g, b)
 
 def effect_startupSplash():
   rainbowBorder()
