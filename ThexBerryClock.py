@@ -23,7 +23,7 @@ def startUp():
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
 #  font = ImageFont.load("pilfonts/timR08.pil")
-  font = ImageFont.truetype("fonts/DroidSans.ttf", 6)
+  font = ImageFont.truetype("fonts/DroidSans.ttf", 10)
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
