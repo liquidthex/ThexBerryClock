@@ -12,12 +12,13 @@ from exchanges.bitstamp import Bitstamp
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, clockmode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList, rainbowBorderMode
+  global matrix, canvas, font, clockmode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList, rainbowBorderMode, btcopen
   rainbowBorderMode = 0
   sleep = 0.01
   clockmode = effect_startupSplash
   iterations = 0
   bitcoin = 0
+  btcopen = 0
   itime = int(time.time())
   timers = {'bitcoin':0};
   timerFreqList = {'bitcoin':60};
@@ -33,9 +34,9 @@ def shutDown():
   exit
 
 def getBitcoinPrice():
-  global bitcoin
-  (bitcoin,btcopen) = Bitstamp.get_current_price()
-  print btcopen
+  global bitcoin,btcopen
+  (bitcoin,btco) = Bitstamp.get_current_price()
+  btcopen = float(bitcoin-btco)
 
 def mainLoop():
   global image, draw, itime, clockmode
@@ -57,7 +58,8 @@ def mainLoop():
   # Execute the current clock line
   clockmode()
 
-  bitcoinDisplay()
+  if clockmode == mainClock:
+    bitcoinDisplay()
 
   # Perform frequency-based timers
   for timer in timerFreqList:
@@ -117,7 +119,17 @@ def mainClock():
 
 def bitcoinDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  draw.text((1, 7), "BTC: " + str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
+  btcs = str(btcopen)
+  if btcs.startswith("-"):
+    btcstr = btcs[1:]
+    (r1,g1,b1) = (255,0,0)
+  else:
+    btcstr = btcs
+    (r1,g1,b1) = (0,255,0)
+  draw.text((1, 7), str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((32, 7), "(", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((36, 7), str(btcstr), font=font, fill=rgb_to_hex((r1,g1,b1)))
+  draw.text((60, 7), ")", font=font, fill=rgb_to_hex((r,g,b)))
 
 def clock420():
   global rainbowBorderMode, clockmode
