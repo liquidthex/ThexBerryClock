@@ -22,8 +22,7 @@ def startUp():
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
-#  font = ImageFont.load("pilfonts/timR08.pil")
-  font = ImageFont.truetype("fonts/DroidSerif-Regular.ttf", 10)
+  font = ImageFont.load("pilfonts/timR08.pil")
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
@@ -48,7 +47,7 @@ def mainLoop():
       timers[timer] = itime
       thread.start_new_thread( timerFuncList[timer], () )
 
-#  rainbowBorder()
+  rainbowBorder()
 #    thread.start_new_thread( getBitcoinPrice, () )
 
   renderDisplay()
@@ -64,8 +63,14 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  draw.text((5, 0), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((1, 5), str(bitcoin) + " : " + str(iterations), font=font, fill=rgb_to_hex((r,g,b)))
+  (r2,g2,b2) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+  (r3,g3,b3) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
+  (r4,g4,b4) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+20)
+
+  draw.text((5, -1), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((1, 7), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r2,g2,b2)))
+  draw.text((1, 14), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r3,g3,b3)))
+  draw.text((1, 21), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r4,g4,b4)))
 
 def rainbowBorder():
   (w,h) = image.size
