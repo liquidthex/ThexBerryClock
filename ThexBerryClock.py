@@ -34,7 +34,8 @@ def shutDown():
 
 def getBitcoinPrice():
   global bitcoin
-  bitcoin = Bitstamp.get_current_price()
+  (bitcoin,btcopen) = Bitstamp.get_current_price()
+  print btcopen
 
 def mainLoop():
   global image, draw, itime, clockmode
