@@ -66,7 +66,7 @@ def effect_startupSplash():
   draw.text((1, 7), "THEXBERRY", font=font, fill=rgb_to_hex((r2,g2,b2)))
   draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
   draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
-  if iterations > 20:
+  if iterations > 5:
     global mode
     mode = mainClock
 
