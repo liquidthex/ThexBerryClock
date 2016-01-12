@@ -11,11 +11,12 @@ import ImageFont
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, mode, iterations, bitcoin, sleep
+  global matrix, canvas, font, mode, iterations, bitcoin, sleep, itime
   sleep = 0.01
   mode = 0
   iterations = 0
   bitcoin = 0
+  itime = time.time()
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
@@ -29,7 +30,8 @@ def getBitcoinPrice():
   bitcoin = bitcoin + 5 
 
 def mainLoop():
-  global image, draw
+  global image, draw, itime
+  itime = time.time()
   image = Image.new("RGB", (64,32))
   draw = ImageDraw.Draw(image)
 
@@ -38,7 +40,7 @@ def mainLoop():
 
 #  rainbowBorder()
 
-  if iterations % 200 == 0:
+  if itime % 60 == 0:
     getBitcoinPrice()
 #    thread.start_new_thread( getBitcoinPrice, () )
 
@@ -55,8 +57,8 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-#  draw.text((5, 0), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((5, 0), str(bitcoin) + " : " + str(iterations), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, 0), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((1, 20), str(bitcoin) + " : " + str(iterations), font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
