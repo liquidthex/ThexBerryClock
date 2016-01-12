@@ -16,7 +16,7 @@ def startUp():
   mode = effect_startupSplash
   iterations = 0
   bitcoin = 0
-  itime = time.time()
+  itime = int(time.time())
   timers = {'bitcoin':itime};
   timerFreqList = {'bitcoin':20};
   timerFuncList = {'bitcoin':getBitcoinPrice};
@@ -36,7 +36,7 @@ def mainLoop():
   global image, draw, itime
 
   # Keep track of the current iteration's time
-  itime = time.time()
+  itime = int(time.time())
 
   # Set up the image canvas
   image = Image.new("RGB", (64,32))
@@ -82,13 +82,13 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  h = time.strftime("%I", itime)
-  m = time.strftime("%M", itime)
-  s = time.strftime("%S", itime)
-  ampm = time.strftime("%p", itime)
-  draw.text((5, -1), h, font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((7, -1), m, font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((9, -1), s, font=font, fill=rgb_to_hex((r,g,b)))
+  h = str(time.strftime("%I"))
+  m = str(time.strftime("%M"))
+  s = str(time.strftime("%S"))
+  ampm = str(time.strftime("%p"))
+  draw.text((5, -1), h+":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((18, -1), m+":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((31, -1), s+" "+ampm, font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
