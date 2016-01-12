@@ -19,7 +19,7 @@ def startUp():
   iterations = 0
   bitcoin = 0
   itime = int(time.time())
-  timers = {'bitcoin':itime};
+  timers = {'bitcoin':0};
   timerFreqList = {'bitcoin':60};
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
