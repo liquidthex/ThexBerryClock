@@ -84,7 +84,10 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+  if (itime % 2 == 0):
+    (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+  else
+    (r1,g1,b1) = (r,g,b)
   h = str(time.strftime("%I"))
   m = str(time.strftime("%M"))
   s = str(time.strftime("%S"))
