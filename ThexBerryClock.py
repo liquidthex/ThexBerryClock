@@ -44,6 +44,7 @@ def mainLoop():
   for timer in timers:
     timeSince = itime - timers[timer]
     if timeSince > timerFreqList[timer]:
+      timers[timer] = itime
       timerFuncList[timer]()
 
 #  rainbowBorder()
