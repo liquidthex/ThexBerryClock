@@ -1,5 +1,7 @@
 #!/bin/bash
  
+cd /opt/ThexBerryClock
+ 
 gitcmd="git pull"
 success="Already up-to-date.$"
 verbose=0 # Set to 1 if you want to see output
