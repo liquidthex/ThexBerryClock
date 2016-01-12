@@ -18,7 +18,7 @@ def startUp():
   bitcoin = 0
   itime = time.time()
   timers = {'bitcoin':itime};
-  timerFreqList = {'bitcoin':60};
+  timerFreqList = {'bitcoin':20};
   timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
@@ -45,7 +45,7 @@ def mainLoop():
     timeSince = itime - timers[timer]
     if timeSince > timerFreqList[timer]:
       timers[timer] = itime
-      timerFuncList[timer]()
+      thread.start_new_thread( timerFuncList[timer], () )
 
 #  rainbowBorder()
 #    thread.start_new_thread( getBitcoinPrice, () )
