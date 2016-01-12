@@ -11,12 +11,15 @@ import ImageFont
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, mode, iterations, bitcoin, sleep, itime
+  global matrix, canvas, font, mode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList
   sleep = 0.01
   mode = 0
   iterations = 0
   bitcoin = 0
   itime = time.time()
+  timers = {'bitcoin':itime};
+  timerFreqList = {'bitcoin':60};
+  timerFuncList = {'bitcoin':getBitcoinPrice};
   matrix = RGBMatrix(32, 2)
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
@@ -38,10 +41,12 @@ def mainLoop():
   if (mode == 0):
     mainClock()
 
-#  rainbowBorder()
+  for timer in timers:
+    timeSince = itime - timers[timer]
+    if timeSince > timerFreqList[timer]:
+      timerFuncList[timer] 
 
-  if itime % 60 == 0:
-    getBitcoinPrice()
+#  rainbowBorder()
 #    thread.start_new_thread( getBitcoinPrice, () )
 
   renderDisplay()
