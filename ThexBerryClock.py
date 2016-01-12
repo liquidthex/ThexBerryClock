@@ -83,22 +83,29 @@ def effect_flashBorder(duration):
     duration = 60
 
 def mainClock():
-  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  h = time.strftime("%I")
+  m = time.strftime("%M")
+  s = time.strftime("%S")
+  ampm = time.strftime("%p")
+
+  # Pre-420
+  if h == 12 and (m == 45 or m == 46):
+   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+  else:
+   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+
+  # Colon Blink Color
   if (itime % 2 == 0):
-    (r1,g1,b1) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
-#    (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+    (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
   else:
     (r1,g1,b1) = (r,g,b)
-  h = str(time.strftime("%I"))
-  m = str(time.strftime("%M"))
-  s = str(time.strftime("%S"))
-  ampm = str(time.strftime("%p"))
-  draw.text((5, -1), h, font=font, fill=rgb_to_hex((r,g,b)))
+
+  draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
   draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-  draw.text((18, -1), m, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
   draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-  draw.text((31, -1), s, font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((43, -1), ampm, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
