@@ -64,7 +64,7 @@ def effect_flashBorder(duration):
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
   draw.text((5, 0), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((1, 20), str(bitcoin) + " : " + str(iterations), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((1, 5), str(bitcoin) + " : " + str(iterations), font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
