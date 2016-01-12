@@ -126,10 +126,10 @@ def bitcoinDisplay():
   else:
     btcstr = btcs
     (r1,g1,b1) = (0,255,0)
-  draw.text((1, 7), str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((32, 7), "(", font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((36, 7), str(btcstr), font=font, fill=rgb_to_hex((r1,g1,b1)))
-  draw.text((60, 7), ")", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((3, 7), str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
+#  draw.text((32, 7), "$", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((34, 7), "$" + str(btcstr), font=font, fill=rgb_to_hex((r1,g1,b1)))
+#  draw.text((60, 7), ")", font=font, fill=rgb_to_hex((r,g,b)))
 
 def clock420():
   global rainbowBorderMode, clockmode
