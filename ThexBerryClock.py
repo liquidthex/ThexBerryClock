@@ -34,22 +34,28 @@ def getBitcoinPrice():
 
 def mainLoop():
   global image, draw, itime
+
+  # Keep track of the current iteration's time
   itime = time.time()
+
+  # Set up the image canvas
   image = Image.new("RGB", (64,32))
   draw = ImageDraw.Draw(image)
 
+  # Execute the current mode
   mode()
 
-  for timer in timers:
+  # Perform frequency-based timers
+  for timer in timerFreqList:
     timeSince = itime - timers[timer]
     if timeSince > timerFreqList[timer]:
       timers[timer] = itime
       thread.start_new_thread( timerFuncList[timer], () )
 
-#  rainbowBorder()
-#    thread.start_new_thread( getBitcoinPrice, () )
-
+  # Output the image canvas to display
   renderDisplay()
+
+  # Pause for garbage collection
   time.sleep(sleep)
 
 def renderDisplay():
@@ -76,7 +82,13 @@ def effect_flashBorder(duration):
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  draw.text((5, -1), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
+  h = time.strftime("%I", itime)
+  m = time.strftime("%M", itime)
+  s = time.strftime("%S", itime)
+  ampm = time.strftime("%p", itime)
+  draw.text((5, -1), h, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((7, -1), m, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((9, -1), s, font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
