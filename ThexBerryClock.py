@@ -13,7 +13,7 @@ def startUp():
   log("Starting up ThexBerryClock...")
   global matrix, canvas, font, mode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList
   sleep = 0.01
-  mode = 0
+  mode = effect_startupSplash
   iterations = 0
   bitcoin = 0
   itime = time.time()
@@ -38,8 +38,7 @@ def mainLoop():
   image = Image.new("RGB", (64,32))
   draw = ImageDraw.Draw(image)
 
-  if (mode == 0):
-    mainClock()
+  mode()
 
   for timer in timers:
     timeSince = itime - timers[timer]
@@ -47,7 +46,7 @@ def mainLoop():
       timers[timer] = itime
       thread.start_new_thread( timerFuncList[timer], () )
 
-  rainbowBorder()
+#  rainbowBorder()
 #    thread.start_new_thread( getBitcoinPrice, () )
 
   renderDisplay()
@@ -57,20 +56,27 @@ def renderDisplay():
   setimage(image, canvas)
   matrix.SwapOnVSync(canvas)
 
+def effect_startupSplash():
+  rainbowBorder()
+  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
+  (r2,g2,b2) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+5)
+  (r3,g3,b3) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
+  (r4,g4,b4) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+15)
+  draw.text((5, -1), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((1, 7), "THEXBERRY", font=font, fill=rgb_to_hex((r2,g2,b2)))
+  draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
+  draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
+  if iterations > 20:
+    global mode
+    mode = mainClock
+
 def effect_flashBorder(duration):
   if not duration:
     duration = 60
 
 def mainClock():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  (r2,g2,b2) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
-  (r3,g3,b3) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
-  (r4,g4,b4) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+20)
-
   draw.text((5, -1), time.strftime("%I:%M:%S %p"), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((1, 7), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r2,g2,b2)))
-  draw.text((1, 14), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r3,g3,b3)))
-  draw.text((1, 21), "THEXBERRYCLOCK", font=font, fill=rgb_to_hex((r4,g4,b4)))
 
 def rainbowBorder():
   (w,h) = image.size
