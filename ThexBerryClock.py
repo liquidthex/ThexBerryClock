@@ -31,7 +31,7 @@ def mainLoop():
   if (mode == 0):
     mainClock()
 
-  rainbowBorder()
+#  rainbowBorder()
 
   renderDisplay()
 
