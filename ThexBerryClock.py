@@ -89,9 +89,8 @@ def mainClock():
   ampm = time.strftime("%p")
 
   # Pre-420
-  if h == "12" and (m == "49" or m == "50"):
-   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
-   draw.text((1, 7), "CHEERS!!!!", font=font, fill=rgb_to_hex((r,g,b)))
+  if ((h == "12" and (m == "52" or m == "53")) or (h == "7" and (m == "9" or m == "10")):
+   (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
   else:
    (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
 
