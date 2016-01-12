@@ -86,9 +86,12 @@ def mainClock():
   m = str(time.strftime("%M"))
   s = str(time.strftime("%S"))
   ampm = str(time.strftime("%p"))
-  draw.text((5, -1), h+":", font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((18, -1), m+":", font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((31, -1), s+" "+ampm, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, -1), h, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, -1), ":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((18, -1), m, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, -1), ":", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((31, -1), s, font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((31, -1), ampm, font=font, fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
