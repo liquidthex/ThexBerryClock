@@ -9,6 +9,9 @@ import Image
 import ImageDraw
 import ImageFont
 import locale
+import signal
+import json
+import os
 from exchanges.bitstamp import Bitstamp
 
 locale.setlocale( locale.LC_ALL, '' )
@@ -31,10 +34,29 @@ def startUp():
   matrix.brightness = 50
   canvas = matrix.CreateFrameCanvas()
   font = ImageFont.load("pilfonts/timR08.pil")
+  signal.signal(signal.SIGUSR1, interruptHandler)
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
   exit
+
+def interruptHandler(a, b):
+  thread.start_new_thread( liveUpdate, () )
+
+def liveUpdate():
+  conf = getInterruptConfig()
+  if not conf:
+    return
+  print str(conf['mode'])
+
+def getInterruptConfig():
+  interruptFile = '/tmp/TBC-INTERRUPT.txt'
+  if not os.path.isfile(interruptFile):
+    return
+  with open(interruptFile,'r') as f:
+    data = json.load(f)
+  os.remove(interruptFile)
+  return data
 
 def getBitcoinPrice():
   global bitcoin,btcopen
