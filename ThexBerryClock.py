@@ -18,22 +18,25 @@ locale.setlocale( locale.LC_ALL, '' )
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global matrix, canvas, font, clockmode, iterations, bitcoin, sleep, itime, timers, timerFreqList, timerFuncList, rainbowBorderMode, btcopen
-  rainbowBorderMode = 0
-  sleep = 0.01
-  clockmode = effect_startupSplash
+  global TBC
+  global iterations, itime
+
   iterations = 0
-  bitcoin = 0
-  btcopen = 0
   itime = int(time.time())
-  timers = {'bitcoin':0};
-  timerFreqList = {'bitcoin':60};
-  timerFuncList = {'bitcoin':getBitcoinPrice};
-  matrix = RGBMatrix(32, 2)
-  matrix.pwmBits = 11
-  matrix.brightness = 50
-  canvas = matrix.CreateFrameCanvas()
-  font = ImageFont.load("pilfonts/timR08.pil")
+  TBC = {}
+  TBC['sleep'] = 0.01
+  TBC['clockmode'] = effect_startupSplash
+  TBC['bitcoin'] = 0
+  TBC['btcopen'] = 0
+  TBC['rainbowBorderMode'] = 0
+  TBC['timers'] = {'bitcoin':0};
+  TBC['timerFreqList'] = {'bitcoin':60};
+  TBC['timerFuncList'] = {'bitcoin':getBitcoinPrice};
+  TBC['matrix'] = RGBMatrix(32, 2)
+  TBC['matrix'].pwmBits = 11
+  TBC['matrix'].brightness = 50
+  TBC['canvas'] = TBC['matrix'].CreateFrameCanvas()
+  TBC['font'] = ImageFont.load("pilfonts/timR08.pil")
   signal.signal(signal.SIGUSR1, interruptHandler)
 
 def shutDown():
@@ -60,12 +63,13 @@ def getInterruptConfig():
   return data
 
 def getBitcoinPrice():
-  global bitcoin,btcopen
-  (bitcoin,btco) = Bitstamp.get_current_price()
-  btcopen = float(bitcoin-btco)
+  global TBC
+  (TBC['bitcoin'],btco) = Bitstamp.get_current_price()
+  TBC['btcopen'] = float(TBC['bitcoin']-btco)
 
 def mainLoop():
-  global image, draw, itime, clockmode
+  global TBC
+  global image, draw, itime
 
   # Keep track of the current iteration's time
   itime = int(time.time())
@@ -79,34 +83,34 @@ def mainLoop():
   m = time.strftime("%M")
   s = time.strftime("%S")
   if (h == "04" and (m == "19" or m == "20")) or (h == "07" and (m == "09" or m == "10")):
-    clockmode = clock420
+    TBC['clockmode'] = clock420
     rainbowBorder()
 
   if m == "00" and (s == "00" or s == "01"):
     effect_borderPulse()
 
   # Execute the current clock line
-  clockmode()
+  TBC['clockmode']()
 
-  if clockmode == mainClock:
+  if TBC['clockmode'] == mainClock:
     bitcoinDisplay()
 
   # Perform frequency-based timers
-  for timer in timerFreqList:
-    timeSince = itime - timers[timer]
-    if timeSince > timerFreqList[timer]:
-      timers[timer] = itime
-      thread.start_new_thread( timerFuncList[timer], () )
+  for timer in TBC['timerFreqList']:
+    timeSince = itime - TBC['timers'][timer]
+    if timeSince > TBC['timerFreqList'][timer]:
+      TBC['timers'][timer] = itime
+      thread.start_new_thread( TBC['timerFuncList'][timer], () )
 
   # Output the image canvas to display
   renderDisplay()
 
   # Pause for garbage collection
-  time.sleep(sleep)
+  time.sleep(TBC['sleep'])
 
 def renderDisplay():
-  setimage(image, canvas)
-  matrix.SwapOnVSync(canvas)
+  setimage(image, TBC['canvas'])
+  TBC['matrix'].SwapOnVSync(TBC['canvas'])
 
 def effect_borderPulse():
   (w,h) = image.size
@@ -123,13 +127,12 @@ def effect_startupSplash():
   (r2,g2,b2) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+5)
   (r3,g3,b3) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
   (r4,g4,b4) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+15)
-  draw.text((5, -1), time.strftime("%I:%M:%S ")+time.strftime("%p").upper(), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((1, 7), "THEXBERRY", font=font, fill=rgb_to_hex((r2,g2,b2)))
-  draw.text((1, 14), "THEXBERRY", font=font, fill=rgb_to_hex((r3,g3,b3)))
-  draw.text((1, 21), "THEXBERRY", font=font, fill=rgb_to_hex((r4,g4,b4)))
+  draw.text((5, -1), time.strftime("%I:%M:%S ")+time.strftime("%p").upper(), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  draw.text((1, 7), "THEXBERRY", font=TBC['font'], fill=rgb_to_hex((r2,g2,b2)))
+  draw.text((1, 14), "THEXBERRY", font=TBC['font'], fill=rgb_to_hex((r3,g3,b3)))
+  draw.text((1, 21), "THEXBERRY", font=TBC['font'], fill=rgb_to_hex((r4,g4,b4)))
   if iterations > 10:
-    global clockmode
-    clockmode = mainClock
+    TBC['clockmode'] = mainClock
 
 def effect_flashBorder(duration):
   if not duration:
@@ -149,65 +152,65 @@ def mainClock():
   else:
     (r1,g1,b1) = (r,g,b)
 
-  draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-  draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-  draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((5, -1), str(h), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  draw.text((15, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+  draw.text((18, -1), str(m), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  draw.text((28, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+  draw.text((31, -1), str(s), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  draw.text((43, -1), str(ampm), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def bitcoinDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
-  btcs = locale.currency(btcopen, grouping=False, symbol=False)
+  btcs = locale.currency(TBC['btcopen'], grouping=False, symbol=False)
   if btcs.startswith("-"):
     btcstr = btcs[1:]
     (r1,g1,b1) = (255,0,0)
   else:
     btcstr = btcs
     (r1,g1,b1) = (0,255,0)
-  draw.text((3, 7), str(bitcoin), font=font, fill=rgb_to_hex((r,g,b)))
-#  draw.text((32, 7), "$", font=font, fill=rgb_to_hex((r,g,b)))
-  draw.text((34, 7), "$" + str(btcstr), font=font, fill=rgb_to_hex((r1,g1,b1)))
-#  draw.text((60, 7), ")", font=font, fill=rgb_to_hex((r,g,b)))
+  draw.text((3, 7), str(TBC['bitcoin']), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+#  draw.text((32, 7), "$", font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  draw.text((34, 7), "$" + str(btcstr), font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+#  draw.text((60, 7), ")", font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def clock420():
-  global rainbowBorderMode, clockmode
+  global TBC
   h = time.strftime("%I")
   m = time.strftime("%M")
   s = time.strftime("%S")
   ampm = time.strftime("%p").upper()
   if (h == "04" and m == "21") or (h == "07" and m == "11"):
-   clockmode = mainClock
+   TBC['clockmode'] = mainClock
 
   (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
 
   if m == "20" or m == "10":
-    rainbowBorderMode = 1
+    TBC['rainbowBorderMode'] = 1
     if itime % 2 == 0:
       (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
-      draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
-      draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-      draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
-      draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-      draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
-      draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
+      draw.text((5, -1), str(h), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+      draw.text((15, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+      draw.text((18, -1), str(m), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+      draw.text((28, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+      draw.text((31, -1), str(s), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+      draw.text((43, -1), str(ampm), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
     else:
       (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
-      draw.text((5, -1), "CHEERS!!!!!", font=font, fill=rgb_to_hex((r,g,b)))
+      draw.text((5, -1), "CHEERS!!!!!", font=TBC['font'], fill=rgb_to_hex((r,g,b)))
   else:
-    rainbowBorderMode = 0
+    TBC['rainbowBorderMode'] = 0
     (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
-    draw.text((5, -1), str(h), font=font, fill=rgb_to_hex((r,g,b)))
-    draw.text((15, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-    draw.text((18, -1), str(m), font=font, fill=rgb_to_hex((r,g,b)))
-    draw.text((28, -1), ":", font=font, fill=rgb_to_hex((r1,g1,b1)))
-    draw.text((31, -1), str(s), font=font, fill=rgb_to_hex((r,g,b)))
-    draw.text((43, -1), str(ampm), font=font, fill=rgb_to_hex((r,g,b)))
+    draw.text((5, -1), str(h), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+    draw.text((15, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+    draw.text((18, -1), str(m), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+    draw.text((28, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
+    draw.text((31, -1), str(s), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+    draw.text((43, -1), str(ampm), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def rainbowBorder():
   (w,h) = image.size
   pix = image.load()
-  if (rainbowBorderMode == 1):
+  if (TBC['rainbowBorderMode'] == 1):
     (r,g,b) = makeColorGradient(1.666, 2.666, 3.666, 0, 2, 4, 128, 127, 8, iterations)
   else:
     (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations)
