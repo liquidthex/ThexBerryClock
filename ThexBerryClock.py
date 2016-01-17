@@ -47,7 +47,8 @@ def liveUpdate():
   conf = getInterruptConfig()
   if not conf:
     return
-  print str(conf['mode'])
+  if conf['mode'] == 'heightupdate':
+    print "Blockchain height: " + str(conf['data']['height'])
 
 def getInterruptConfig():
   interruptFile = '/tmp/TBC-INTERRUPT.txt'
