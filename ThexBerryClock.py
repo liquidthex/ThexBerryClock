@@ -41,7 +41,7 @@ def startUp():
   signal.signal(signal.SIGUSR1, interruptHandler)
 
 def startup_blockheight():
-  getInterruptConfig('/tmp/latestBlockheight.txt')
+  liveUpdate('/tmp/latestBlockheight.txt', 0)
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
@@ -94,29 +94,28 @@ def renderDisplay():
   TBC['matrix'].SwapOnVSync(TBC['canvas'])
 
 def interruptHandler(a, b):
-  thread.start_new_thread( liveUpdate, () )
+  thread.start_new_thread( liveUpdate, ('/tmp/TBC-INTERRUPT.txt',1) )
 
-def liveUpdate():
-  conf = getInterruptConfig()
+def liveUpdate(confFile, removeConf):
+  conf = getInterruptConfig(confFile, removeConf)
   if not conf:
     return
   if conf['mode'] == 'heightupdate':
     try:
-      TBC['blockheight'] = conf['data']['height']
+      if TBC['blockheight'] != conf['data']['height']:
+        TBC['blockheight'] = conf['data']['height']
+        TBC['blockheight_time'] = itime
     except:
       TBC['blockheight'] = 0
     log("Blockheight update: " + str(conf['data']['height']))
 
-def getInterruptConfig(filename):
-  if filename:
-    interruptFile = filename
-  else:
-    interruptFile = '/tmp/TBC-INTERRUPT.txt'
+def getInterruptConfig(interruptFile,removeInterrupt):
   if not os.path.isfile(interruptFile):
     return
   with open(interruptFile,'r') as f:
     data = json.load(f)
-  os.remove(interruptFile)
+  if removeInterrupt == 1:
+    os.remove(interruptFile)
   return data
 
 def getBitcoinPrice():
