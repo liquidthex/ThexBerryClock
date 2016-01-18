@@ -2,6 +2,7 @@
 
 import thread
 import time
+import datetime
 from datetime import date
 import math
 from rgbmatrix import RGBMatrix
@@ -23,14 +24,16 @@ def startUp():
   iterations = 0
   itime = int(time.time())
   TBC = {}
+  TBC['epoch']=datetime.datetime.utcfromtimestamp(0)
+  TBC['bhdisplay'] = 0
   TBC['sleep'] = 0.01
   TBC['clockmode'] = effect_startupSplash
   TBC['bitcoin'] = 0
   TBC['btcopen'] = 0
   TBC['rainbowBorderMode'] = 0
-  TBC['timers'] = {'bitcoin':0};
-  TBC['timerFreqList'] = {'bitcoin':60};
-  TBC['timerFuncList'] = {'bitcoin':getBitcoinPrice};
+  TBC['timers'] = {'bitcoin':0,'bhflipper':0};
+  TBC['timerFreqList'] = {'bitcoin':60,'bhflipper':10};
+  TBC['timerFuncList'] = {'bitcoin':getBitcoinPrice,'bhflipper':blockheight_flipDisplay};
   TBC['matrix'] = RGBMatrix(32, 2)
   TBC['matrix'].pwmBits = 11
   TBC['matrix'].brightness = 50
@@ -79,7 +82,7 @@ def mainLoop():
   # Perform frequency-based timers
   for timer in TBC['timerFreqList']:
     timeSince = itime - TBC['timers'][timer]
-    if timeSince > TBC['timerFreqList'][timer]:
+    if timeSince >= TBC['timerFreqList'][timer]:
       TBC['timers'][timer] = itime
       thread.start_new_thread( TBC['timerFuncList'][timer], () )
 
@@ -104,6 +107,9 @@ def liveUpdate(confFile, removeConf):
     try:
       if TBC['blockheight'] != conf['data']['height']:
         TBC['blockheight'] = conf['data']['height']
+        TBC['blockheight_date'] = conf['data']['time']
+        TBC['blockheight_tx'] = conf['data']['n_tx']
+        TBC['blockheight_bytes'] = conf['data']['size']
         TBC['blockheight_time'] = itime
     except:
       TBC['blockheight'] = 0
@@ -171,25 +177,40 @@ def mainClock():
   draw.text((31, -1), str(s), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
   draw.text((43, -1), str(ampm), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
+def blockheight_flipDisplay():
+  if TBC['bhdisplay'] == 1:
+    TBC['bhdisplay'] = 0
+  else:
+    TBC['bhdisplay'] = 1
+
 def blockheightDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
   if (TBC['blockheight'] == 0):
     return
 #  (r,g,b) = makeColorGradient(.1, .1, .1, 0.2, 0.5, 0.8, 128, 127, 255, iterations)
-  secsSinceUpdate = itime - TBC['blockheight_time']
+  bhdate = datetime.datetime.strptime(TBC['blockheight_date'], "%Y-%m-%dT%H:%M:%SZ")
+  secsSinceUpdate = itime - (bhdate-TBC['epoch']).total_seconds()
+
+#  secsSinceUpdate = itime - TBC['blockheight_time']
   percent = secsSinceUpdate * 5
   if percent < 100:
-    if percent == 0:
+    if percent <= 0:
       percent = 1
-    gr=linear_gradient("#33FF33",rgb_to_hex((r, g, b)),percent,100)
+    gr=linear_gradient("#FFFFFF",rgb_to_hex((r, g, b)),percent,100)
     r=gr['r'][0]
     g=gr['g'][0]
     b=gr['b'][0]
-  draw.text((1, 14), str(TBC['blockheight']), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+  txt = str(TBC['blockheight']) + " " + str(TBC['blockheight_tx']) + "tx"
+  ago = int(secsSinceUpdate/60)
+  if TBC['bhdisplay'] == 0:
+    txt = str(ago) + " min " + str(TBC['blockheight_bytes']/1024) + "KB"
+  
+  draw.text((1, 14), str(txt), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def bitcoinDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
   btcs = locale.currency(TBC['btcopen'], grouping=False, symbol=False)
+  # TODO: Pixel Up/Down arrows
   if btcs.startswith("-"):
     btcstr = btcs[1:]
     (r1,g1,b1) = (255,0,0)
@@ -275,11 +296,6 @@ def hex_to_RGB(hex):
   # Pass 16 to the integer function for change of base
   return [int(hex[i:i+2], 16) for i in range(1,6,2)]
 
-def color_dict(gradient):
-  return {"hex":[RGB_to_hex(RGB) for RGB in gradient],
-      "r":[RGB[0] for RGB in gradient],
-      "g":[RGB[1] for RGB in gradient],
-      "b":[RGB[2] for RGB in gradient]}
 
 def linear_gradient(start_hex, finish_hex, i, n):
   s = hex_to_RGB(start_hex)
@@ -289,6 +305,12 @@ def linear_gradient(start_hex, finish_hex, i, n):
     for j in range(3)
   ]
   return color_dict([vector])
+
+def color_dict(gradient):
+  return {"hex":[RGB_to_hex(RGB) for RGB in gradient],
+      "r":[RGB[0] for RGB in gradient],
+      "g":[RGB[1] for RGB in gradient],
+      "b":[RGB[2] for RGB in gradient]}
 
 def log(msg):
   print msg
