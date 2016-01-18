@@ -173,6 +173,18 @@ def mainClock():
 
 def blockheightDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  if (TBC['blockheight'] == 0):
+    return
+#  (r,g,b) = makeColorGradient(.1, .1, .1, 0.2, 0.5, 0.8, 128, 127, 255, iterations)
+  secsSinceUpdate = itime - TBC['blockheight_time']
+  percent = secsSinceUpdate * 5
+  if percent < 100:
+    if percent == 0:
+      percent = 1
+    gr=linear_gradient("#33FF33",rgb_to_hex((r, g, b)),percent,100)
+    r=gr['r'][0]
+    g=gr['g'][0]
+    b=gr['b'][0]
   draw.text((1, 14), str(TBC['blockheight']), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def bitcoinDisplay():
@@ -196,7 +208,7 @@ def clock420():
   s = time.strftime("%S")
   ampm = time.strftime("%p").upper()
   if (h == "04" and m == "21") or (h == "07" and m == "11"):
-   TBC['clockmode'] = mainClock
+    TBC['clockmode'] = mainClock
 
   (r1,g1,b1) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, iterations+10)
 
@@ -252,6 +264,31 @@ def setimage(im,mx):
 
 def rgb_to_hex(rgb):
   return '#%02x%02x%02x' % rgb
+
+def RGB_to_hex(RGB):
+  # Components need to be integers for hex to make sense
+  RGB = [int(x) for x in RGB]
+  return "#"+"".join(["0{0:x}".format(v) if v < 16 else
+            "{0:x}".format(v) for v in RGB])
+
+def hex_to_RGB(hex):
+  # Pass 16 to the integer function for change of base
+  return [int(hex[i:i+2], 16) for i in range(1,6,2)]
+
+def color_dict(gradient):
+  return {"hex":[RGB_to_hex(RGB) for RGB in gradient],
+      "r":[RGB[0] for RGB in gradient],
+      "g":[RGB[1] for RGB in gradient],
+      "b":[RGB[2] for RGB in gradient]}
+
+def linear_gradient(start_hex, finish_hex, i, n):
+  s = hex_to_RGB(start_hex)
+  f = hex_to_RGB(finish_hex)
+  vector = [
+    int(s[j] + (float(i)/(n-1))*(f[j]-s[j]))
+    for j in range(3)
+  ]
+  return color_dict([vector])
 
 def log(msg):
   print msg
