@@ -18,8 +18,7 @@ locale.setlocale( locale.LC_ALL, '' )
 
 def startUp():
   log("Starting up ThexBerryClock...")
-  global TBC
-  global iterations, itime
+  global TBC, iterations, itime
 
   iterations = 0
   itime = int(time.time())
@@ -37,35 +36,16 @@ def startUp():
   TBC['matrix'].brightness = 50
   TBC['canvas'] = TBC['matrix'].CreateFrameCanvas()
   TBC['font'] = ImageFont.load("pilfonts/timR08.pil")
+  TBC['blockheight'] = 0
+  thread.start_new_thread( startup_blockheight, () )
   signal.signal(signal.SIGUSR1, interruptHandler)
+
+def startup_blockheight():
+  getInterruptConfig('/tmp/latestBlockheight.txt')
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
   exit
-
-def interruptHandler(a, b):
-  thread.start_new_thread( liveUpdate, () )
-
-def liveUpdate():
-  conf = getInterruptConfig()
-  if not conf:
-    return
-  if conf['mode'] == 'heightupdate':
-    print "Blockchain height: " + str(conf['data']['height'])
-
-def getInterruptConfig():
-  interruptFile = '/tmp/TBC-INTERRUPT.txt'
-  if not os.path.isfile(interruptFile):
-    return
-  with open(interruptFile,'r') as f:
-    data = json.load(f)
-  os.remove(interruptFile)
-  return data
-
-def getBitcoinPrice():
-  global TBC
-  (TBC['bitcoin'],btco) = Bitstamp.get_current_price()
-  TBC['btcopen'] = float(TBC['bitcoin']-btco)
 
 def mainLoop():
   global TBC
@@ -94,6 +74,7 @@ def mainLoop():
 
   if TBC['clockmode'] == mainClock:
     bitcoinDisplay()
+    blockheightDisplay()
 
   # Perform frequency-based timers
   for timer in TBC['timerFreqList']:
@@ -111,6 +92,38 @@ def mainLoop():
 def renderDisplay():
   setimage(image, TBC['canvas'])
   TBC['matrix'].SwapOnVSync(TBC['canvas'])
+
+def interruptHandler(a, b):
+  thread.start_new_thread( liveUpdate, () )
+
+def liveUpdate():
+  conf = getInterruptConfig()
+  if not conf:
+    return
+  if conf['mode'] == 'heightupdate':
+    try:
+      TBC['blockheight'] = conf['data']['height']
+    except:
+      TBC['blockheight'] = 0
+    log("Blockheight update: " + str(conf['data']['height']))
+
+def getInterruptConfig(filename):
+  if filename:
+    interruptFile = filename
+  else:
+    interruptFile = '/tmp/TBC-INTERRUPT.txt'
+  if not os.path.isfile(interruptFile):
+    return
+  with open(interruptFile,'r') as f:
+    data = json.load(f)
+  os.remove(interruptFile)
+  return data
+
+def getBitcoinPrice():
+  global TBC
+  (TBC['bitcoin'],btco) = Bitstamp.get_current_price()
+  TBC['btcopen'] = float(TBC['bitcoin']-btco)
+
 
 def effect_borderPulse():
   (w,h) = image.size
@@ -158,6 +171,10 @@ def mainClock():
   draw.text((28, -1), ":", font=TBC['font'], fill=rgb_to_hex((r1,g1,b1)))
   draw.text((31, -1), str(s), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
   draw.text((43, -1), str(ampm), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
+
+def blockheightDisplay():
+  (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
+  draw.text((1, 14), str(TBC['blockheight']), font=TBC['font'], fill=rgb_to_hex((r,g,b)))
 
 def bitcoinDisplay():
   (r,g,b) = makeColorGradient(.1, .1, .1, 0, 2, 4, 128, 127, 255, int(time.time())/60)
