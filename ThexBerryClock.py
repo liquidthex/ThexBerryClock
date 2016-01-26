@@ -190,9 +190,10 @@ def blockheightDisplay():
 #  (r,g,b) = makeColorGradient(.1, .1, .1, 0.2, 0.5, 0.8, 128, 127, 255, iterations)
   bhdate = datetime.datetime.strptime(TBC['blockheight_date'], "%Y-%m-%dT%H:%M:%SZ")
   secsSinceUpdate = itime - (bhdate-TBC['epoch']).total_seconds()
+  secsSince = itime - TBC['blockheight_time']
 
 #  secsSinceUpdate = itime - TBC['blockheight_time']
-  percent = secsSinceUpdate * 5
+  percent = secsSince * 5
   if percent < 100:
     if percent <= 0:
       percent = 1
@@ -200,7 +201,8 @@ def blockheightDisplay():
     r=gr['r'][0]
     g=gr['g'][0]
     b=gr['b'][0]
-  txt = str(TBC['blockheight']) + " " + str(TBC['blockheight_tx']) + "tx"
+#  txt = str(TBC['blockheight']) + " " + str(TBC['blockheight_tx']) + "tx"
+  txt = "        " + str(TBC['blockheight'])
   ago = int(secsSinceUpdate/60)
   if TBC['bhdisplay'] == 0:
     txt = str(ago) + " min " + str(TBC['blockheight_bytes']/1024) + "KB"
