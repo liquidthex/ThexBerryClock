@@ -25,6 +25,7 @@ import json
 import os
 import sys
 import logging
+import subprocess
 from exchanges.bitstamp import Bitstamp
 
 locale.setlocale( locale.LC_ALL, 'en_GB.utf8' )
@@ -126,6 +127,8 @@ def liveUpdate(confFile, removeConf):
     except:
       TBC['blockheight'] = 0
     log("Blockheight update: " + str(conf['data']['height']))
+  elif conf['mode'] == 'toke':
+    log("Toke called: " + str(conf))
 
 def getInterruptConfig(interruptFile,removeInterrupt):
   if not os.path.isfile(interruptFile):
@@ -330,6 +333,27 @@ def usage():
   print "ThexBerryClock"
   print "-----------------------------"
   print "ThexBerryClock.py daemon - Launch clock daemon"
+  print "ThexBerryClock.py toke - Perform a toke effect"
+
+def command_toke():
+  try:
+    a2 = sys.argv[2]
+  except:
+    a2 = 60
+  command = {}
+  command['mode'] = 'toke'
+  command['duration'] = a2
+  sendCommand(command)
+
+def sendInterrupt():
+  subprocess.call('/usr/bin/killall -USR1 ThexBerryClock.py', shell=True)
+
+def sendCommand(myDict):
+  f = open(interruptFile, 'w')
+  f.write(json.dumps(myDict))
+  f.close()
+  sendInterrupt()
+  print "Sent command to clock: " + str(myDict)
 
 def commandLine():
   try:
@@ -338,7 +362,13 @@ def commandLine():
     a1 = ''
   if a1 == "daemon":
     return True
-  usage()
+  elif a1 == "interrupt":
+    sendInterrupt()
+  elif a1 == "toke":
+    command_toke()
+  else:
+    usage()
+  return False
 
 def TBCLoop():
   global iterations
