@@ -26,7 +26,7 @@ import os
 import logging
 from exchanges.bitstamp import Bitstamp
 
-locale.setlocale( locale.LC_ALL, '' )
+locale.setlocale( locale.LC_ALL, 'en_GB.utf8' )
 
 def startUp():
   log("Starting up ThexBerryClock...")
@@ -343,3 +343,4 @@ fh = logging.FileHandler(logFile, "w")
 fh.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 TBCLoop()
+
