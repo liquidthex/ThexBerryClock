@@ -1,5 +1,15 @@
 #!/usr/bin/python
 
+## Configuration
+basePath = '/opt/ThexBerryClock'
+logFile = '/tmp/TBC.log'
+blockHeightFile = '/tmp/latestBlockheight.txt'
+interruptFile = '/tmp/TBC-INTERRUPT.txt'
+
+# App will stay in foreground & verbose logging
+debugMode = False
+
+# Main script
 import thread
 import time
 import datetime
@@ -13,6 +23,7 @@ import locale
 import signal
 import json
 import os
+import logging
 from exchanges.bitstamp import Bitstamp
 
 locale.setlocale( locale.LC_ALL, '' )
@@ -38,13 +49,13 @@ def startUp():
   TBC['matrix'].pwmBits = 11
   TBC['matrix'].brightness = 50
   TBC['canvas'] = TBC['matrix'].CreateFrameCanvas()
-  TBC['font'] = ImageFont.load("pilfonts/timR08.pil")
+  TBC['font'] = ImageFont.load(basePath + "/pilfonts/timR08.pil")
   TBC['blockheight'] = 0
   thread.start_new_thread( startup_blockheight, () )
   signal.signal(signal.SIGUSR1, interruptHandler)
 
 def startup_blockheight():
-  liveUpdate('/tmp/latestBlockheight.txt', 0)
+  liveUpdate(blockHeightFile, 0)
 
 def shutDown():
   log("Main loop exited after " + str(iterations) + " iterations. Shutting down.")
@@ -97,7 +108,7 @@ def renderDisplay():
   TBC['matrix'].SwapOnVSync(TBC['canvas'])
 
 def interruptHandler(a, b):
-  thread.start_new_thread( liveUpdate, ('/tmp/TBC-INTERRUPT.txt',1) )
+  thread.start_new_thread( liveUpdate, (interruptFile,1) )
 
 def liveUpdate(confFile, removeConf):
   conf = getInterruptConfig(confFile, removeConf)
@@ -315,11 +326,20 @@ def color_dict(gradient):
       "b":[RGB[2] for RGB in gradient]}
 
 def log(msg):
-  print msg
+  logger.debug(str(msg))
 
-iterations = 0
-startUp()
-while 1:
-  mainLoop()
-  iterations = iterations + 1
-shutDown()
+def TBCLoop():
+  global iterations
+  startUp()
+  while 1:
+    mainLoop()
+    iterations = iterations + 1
+  shutDown()
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(logFile, "w")
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+TBCLoop()
