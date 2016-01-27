@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## Configuration
+## Configuration -- Note there is more config down lower in the startUp function, such as brightness
 basePath = '/opt/ThexBerryClock'
 logFile = '/tmp/TBC.log'
 blockHeightFile = '/tmp/latestBlockheight.txt'
@@ -23,6 +23,7 @@ import locale
 import signal
 import json
 import os
+import sys
 import logging
 from exchanges.bitstamp import Bitstamp
 
@@ -162,10 +163,6 @@ def effect_startupSplash():
   draw.text((1, 21), "THEXBERRY", font=TBC['font'], fill=rgb_to_hex((r4,g4,b4)))
   if iterations > 10:
     TBC['clockmode'] = mainClock
-
-def effect_flashBorder(duration):
-  if not duration:
-    duration = 60
 
 def mainClock():
   h = time.strftime("%I")
@@ -328,6 +325,21 @@ def color_dict(gradient):
 def log(msg):
   logger.debug(str(msg))
 
+def usage():
+  print "-----------------------------"
+  print "ThexBerryClock"
+  print "-----------------------------"
+  print "ThexBerryClock.py daemon - Launch clock daemon"
+
+def commandLine():
+  try:
+    a1 = sys.argv[1]
+  except:
+    a1 = ''
+  if a1 == "daemon":
+    return True
+  usage()
+
 def TBCLoop():
   global iterations
   startUp()
@@ -336,11 +348,10 @@ def TBCLoop():
     iterations = iterations + 1
   shutDown()
 
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(logFile, "w")
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
-TBCLoop()
-
+if commandLine() == True:
+  logger = logging.getLogger(__name__)
+  logger.setLevel(logging.DEBUG)
+  fh = logging.FileHandler(logFile, "w")
+  fh.setLevel(logging.DEBUG)
+  logger.addHandler(fh)
+  TBCLoop()
