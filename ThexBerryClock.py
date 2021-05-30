@@ -31,7 +31,7 @@ from exchanges.bitstamp import Bitstamp
 locale.setlocale( locale.LC_ALL, 'en_GB.utf8' )
 
 def startUp():
-  log("Starting up ThexBerryClock...")
+  log("Starting up ThexBerryClock (test)...")
   global TBC, iterations, itime
 
   iterations = 0
@@ -44,9 +44,9 @@ def startUp():
   TBC['bitcoin'] = 0
   TBC['btcopen'] = 0
   TBC['rainbowBorderMode'] = 0
-  TBC['timers'] = {'bitcoin':0,'bhflipper':0};
-  TBC['timerFreqList'] = {'bitcoin':60,'bhflipper':10};
-  TBC['timerFuncList'] = {'bitcoin':getBitcoinPrice,'bhflipper':blockheight_flipDisplay};
+  TBC['timers'] = {'bitcoin':0,'bhflipper':0}
+  TBC['timerFreqList'] = {'bitcoin':60,'bhflipper':10}
+  TBC['timerFuncList'] = {'bitcoin':getBitcoinPrice,'bhflipper':blockheight_flipDisplay}
   TBC['matrix'] = RGBMatrix(32, 2)
   TBC['matrix'].pwmBits = 11
   TBC['matrix'].brightness = 50
@@ -329,11 +329,11 @@ def log(msg):
   logger.debug(str(msg))
 
 def usage():
-  print "-----------------------------"
-  print "ThexBerryClock"
-  print "-----------------------------"
-  print "ThexBerryClock.py daemon - Launch clock daemon"
-  print "ThexBerryClock.py toke - Perform a toke effect"
+  print("-----------------------------")
+  print("ThexBerryClock")
+  print("-----------------------------")
+  print("ThexBerryClock.py daemon - Launch clock daemon")
+  print("ThexBerryClock.py toke - Perform a toke effect")
 
 def command_toke():
   try:
@@ -353,7 +353,7 @@ def sendCommand(myDict):
   f.write(json.dumps(myDict))
   f.close()
   sendInterrupt()
-  print "Sent command to clock: " + str(myDict)
+  print("Sent command to clock: " + str(myDict))
 
 def commandLine():
   try:
